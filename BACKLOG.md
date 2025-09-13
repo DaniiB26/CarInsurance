@@ -7,7 +7,7 @@
 ## Task B
 ### 1) Register Insurance Claim
 - Created `InsuranceClaim` entity with fields: car, policy, claimDate, description, amount.
-- Added `InsuranceClaimRepository` and `findByCarIdOrderByClaimDateAsc` with `@EntityGraph(attributePaths = {"policy"})`.
+- Added `InsuranceClaimRepository` and `findByCarIdOrderByClaimDateAsc` with `@EntityGraph(attributePaths = {"policy, car"})`.
 - Service: `createClaim(carId, date, description, amount)` attaches the active policy for that date; returns `null` if the car doesn’t exist or no active policy matches the date; otherwise saves and returns the claim.
 - Added `ClaimDto` with validation: `@NotNull claimDate`, `@NotBlank description`, `@NotNull @Positive amount`.
 - Controller: `POST /api/cars/{carId}/claims` accepts validated body, returns `201 Created` with `Location` and the created claim; returns `404` for missing car or no active policy; returns `400` for validation errors.
@@ -46,3 +46,9 @@ I didn’t have much experience with MVC tests before, but after reading a bit, 
 - Succes -> **200 OK**, JSON fields correct.
 
 I also added carExists(Long carId) in the service to support these checks.
+
+## Task D
+
+- I started this task by enabling scheduling.
+- Next, I created a method to return the list of insurance policies by their **end date**.
+- Finally, I added a **scheduler** in the utils. My approach was that, once a new day begins, the scheduler runs and checks which policies expired on the previous day.

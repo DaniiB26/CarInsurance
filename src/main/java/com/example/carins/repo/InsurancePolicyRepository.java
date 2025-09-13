@@ -23,10 +23,14 @@ public interface InsurancePolicyRepository extends JpaRepository<InsurancePolicy
             "order by p.startDate asc")
     List<InsurancePolicy> findByCarId(@Param("carId") Long carId);
 
-        @Query("select p from InsurancePolicy p " +
+    @Query("select p from InsurancePolicy p " +
            "where p.car.id = :carId " +
            "and p.startDate <= :date " +
            "and p.endDate >= :date " +
            "order by p.startDate desc")
     List<InsurancePolicy> findActiveOnDate(@Param("carId") Long carId, @Param("date") LocalDate date);
+
+    @Query("select p from InsurancePolicy p " + 
+            "where p.endDate = :date ")
+    List<InsurancePolicy> findByEndDate(@Param("date") LocalDate date);
 }
