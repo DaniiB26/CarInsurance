@@ -35,6 +35,10 @@ public class CarService {
         // TODO: optionally throw NotFound if car does not exist
         return policyRepository.existsActiveOnDate(carId, date);
     }
+
+    public boolean carExists(Long id) {
+        return carRepository.existsById(id);
+    }
     
     public InsuranceClaim createClaim(Long carId, LocalDate claimDate, String description, Double amount) {
         var car = carRepository.findById(carId).orElse(null);
@@ -47,7 +51,7 @@ public class CarService {
 
     public List<InsuranceClaim> getCarHistory(Long carId) {
         if (carId == null) return null;
-        if (!carRepository.existsById(carId)) return null;
+        if (!carExists(carId)) return null;
         return claimRepository.findByCarIdOrderByClaimDateAsc(carId);
     }
 }

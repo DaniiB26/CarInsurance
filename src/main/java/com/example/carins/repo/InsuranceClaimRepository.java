@@ -8,6 +8,6 @@ import java.util.List;
 @Repository
 public interface InsuranceClaimRepository extends JpaRepository<InsuranceClaim, Long> {
 
-    @EntityGraph(attributePaths = {"policy"})
+    @EntityGraph(attributePaths = {"policy", "car"})
     List<InsuranceClaim> findByCarIdOrderByClaimDateAsc(Long carId);
 }

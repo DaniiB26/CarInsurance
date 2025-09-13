@@ -21,4 +21,28 @@
 
 ## Task C
 
+I didn’t have much experience with MVC tests before, but after reading a bit, I realized they are actually very straightforward and easy to implement.
 
+### What it validates:
+- **Date format** must be ISO (`YYYY-MM-DD`).  
+  -> If not, returns **400** with message: *"Date format must be YYYY-MM-DD"*.
+
+- **Date range** must be between `1900-01-01` and `2100-12-31`.  
+  -> If not, returns **400** with message showing the allowed range.
+
+- **Car existence** is verified with `service.carExists(carId)`.  
+  -> If the car does not exist, returns **404**.
+
+- **Success case**: returns **200 OK** with JSON
+
+### Tests (WebMvcTest)
+
+- Invalid format -> **400** with correct message.
+
+- Out of range -> **400** with correct message.
+
+- Non-existing car -> **404**.
+
+- Succes -> **200 OK**, JSON fields correct.
+
+I also added carExists(Long carId) in the service to support these checks.

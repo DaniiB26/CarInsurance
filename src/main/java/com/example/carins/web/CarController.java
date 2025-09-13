@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -32,10 +33,22 @@ public class CarController {
 
     @GetMapping("/cars/{carId}/insurance-valid")
     public ResponseEntity<?> isInsuranceValid(@PathVariable Long carId, @RequestParam String date) {
-        // TODO: validate date format and handle errors consistently
-        LocalDate d = LocalDate.parse(date);
-        boolean valid = service.isInsuranceValid(carId, d);
-        return ResponseEntity.ok(new InsuranceValidityResponse(carId, d.toString(), valid));
+        try {
+            LocalDate d = LocalDate.parse(date);
+            var min = LocalDate.of(1900, 1, 1);
+            var max = LocalDate.of(2100, 12, 31);
+            if (d.isBefore(min) || d.isAfter(max)) {
+                return ResponseEntity.badRequest().body("Date must be between " + min + " and " + max);
+            }
+            if (!service.carExists(carId)) {
+                return ResponseEntity.notFound().build();
+            }
+            boolean valid = service.isInsuranceValid(carId, d);
+            return ResponseEntity.ok(new InsuranceValidityResponse(carId, d.toString(), valid));
+
+        } catch (DateTimeParseException ex) {
+            return ResponseEntity.badRequest().body("Date format must be YYYY-MM-DD");
+        }
     }
 
     @GetMapping("/cars/{carId}/history")
@@ -43,6 +56,11 @@ public class CarController {
         if (carId == null) {
             return ResponseEntity.badRequest().body("Car ID must be provided");
         }
+
+        if (!service.carExists(carId)) {
+            return ResponseEntity.notFound().build();
+        }
+
         var claims = service.getCarHistory(carId);
         if (claims == null) {
             return ResponseEntity.notFound().build();
