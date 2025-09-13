@@ -18,5 +18,15 @@ public interface InsurancePolicyRepository extends JpaRepository<InsurancePolicy
            "and p.endDate >= :date")
     boolean existsActiveOnDate(@Param("carId") Long carId, @Param("date") LocalDate date);
 
-    List<InsurancePolicy> findByCarId(Long carId);
+    @Query("select p from InsurancePolicy p " + 
+            "where p.car.id = :carId " + 
+            "order by p.startDate asc")
+    List<InsurancePolicy> findByCarId(@Param("carId") Long carId);
+
+        @Query("select p from InsurancePolicy p " +
+           "where p.car.id = :carId " +
+           "and p.startDate <= :date " +
+           "and p.endDate >= :date " +
+           "order by p.startDate desc")
+    List<InsurancePolicy> findActiveOnDate(@Param("carId") Long carId, @Param("date") LocalDate date);
 }

@@ -1,22 +1,29 @@
 package com.example.carins.service;
 
 import com.example.carins.model.Car;
+import com.example.carins.model.InsuranceClaim;
+import com.example.carins.model.InsurancePolicy;
 import com.example.carins.repo.CarRepository;
+import com.example.carins.repo.InsuranceClaimRepository;
 import com.example.carins.repo.InsurancePolicyRepository;
+import com.example.carins.web.dto.*;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class CarService {
 
     private final CarRepository carRepository;
     private final InsurancePolicyRepository policyRepository;
+    private final InsuranceClaimRepository claimRepository;
 
-    public CarService(CarRepository carRepository, InsurancePolicyRepository policyRepository) {
+    public CarService(CarRepository carRepository, InsurancePolicyRepository policyRepository, InsuranceClaimRepository claimRepository) {
         this.carRepository = carRepository;
         this.policyRepository = policyRepository;
+        this.claimRepository = claimRepository;
     }
 
     public List<Car> listCars() {
@@ -27,5 +34,20 @@ public class CarService {
         if (carId == null || date == null) return false;
         // TODO: optionally throw NotFound if car does not exist
         return policyRepository.existsActiveOnDate(carId, date);
+    }
+    
+    public InsuranceClaim createClaim(Long carId, LocalDate claimDate, String description, Double amount) {
+        var car = carRepository.findById(carId).orElse(null);
+        if (car == null) return null;
+        var activePolicy = policyRepository.findActiveOnDate(carId, claimDate).stream().findFirst().orElse(null);
+        if (activePolicy == null) return null;
+        var claim = new InsuranceClaim(car, activePolicy, claimDate, description, amount);
+        return claimRepository.save(claim);
+    }
+
+    public List<InsuranceClaim> getCarHistory(Long carId) {
+        if (carId == null) return null;
+        if (!carRepository.existsById(carId)) return null;
+        return claimRepository.findByCarIdOrderByClaimDateAsc(carId);
     }
 }
