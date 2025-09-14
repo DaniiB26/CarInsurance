@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface CarRepository extends JpaRepository<Car, Long> {
-    // TODO: enforce unique VIN at DB and via validation (exercise)
+    Boolean existsByVin(String vin);
     @EntityGraph(attributePaths = {"owner"})
     List<Car> findAll();
     Optional<Car> findByVin(String vin);

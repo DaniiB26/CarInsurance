@@ -11,6 +11,7 @@ public class Car {
     private Long id;
 
     @NotBlank @Size(min = 5, max = 32)
+    @Column(unique = true, nullable = false)
     private String vin;
 
     private String make;

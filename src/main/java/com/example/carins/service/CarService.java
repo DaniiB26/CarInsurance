@@ -9,6 +9,7 @@ import com.example.carins.repo.InsurancePolicyRepository;
 import com.example.carins.web.dto.*;
 
 import org.springframework.stereotype.Service;
+import com.example.carins.web.error.NotFoundException;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -32,7 +33,9 @@ public class CarService {
 
     public boolean isInsuranceValid(Long carId, LocalDate date) {
         if (carId == null || date == null) return false;
-        // TODO: optionally throw NotFound if car does not exist
+        if (!carRepository.existsById(carId)) {
+            throw new NotFoundException("Car doesn't exist!");
+        }
         return policyRepository.existsActiveOnDate(carId, date);
     }
 
